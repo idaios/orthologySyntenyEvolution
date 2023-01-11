@@ -1,0 +1,27 @@
+
+Homo_sapiens.GRCh38.pep.all.fa: Total sequences: 121541
+29 were skipped. Probably because of scaffold
+
+Pan_troglodytes.Pan_tro_3.0.pep.all.fa: Total sequences: 49949
+2357 were skipped. Probably because of scaffold
+
+Pongo_abelii.Susie_PABv2.pep.all.fa: Total sequences: 38110
+0 were skipped. Probably because of scaffold
+
+Macaca_mulatta.Mmul_10.pep.all.fa: Total sequences: 48770
+0 were skipped. Probably because of scaffold
+
+Mus_musculus.GRCm39.pep.all.fa: Total sequences: 67155
+53 were skipped. Probably because of scaffold
+
+Sciurus_vulgaris.mSciVul1.1.pep.all.fa: Total sequences: 33234
+0 were skipped. Probably because of scaffold
+
+Felis_catus.Felis_catus_9.0.pep.all.fa: Total sequences: 40302
+250 were skipped. Probably because of scaffold
+
+Equus_caballus.EquCab3.0.pep.all.fa: Total sequences: 44934
+0 were skipped. Probably because of scaffold
+
+Canis_lupus_familiaris.ROS_Cfam_1.0.pep.all.fa: Total sequences: 43525
+0 were skipped. Probably because of scaffold

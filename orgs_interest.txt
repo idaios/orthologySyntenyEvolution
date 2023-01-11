@@ -1,0 +1,9 @@
+homo_sapiens
+pan_troglodytes
+pongo_abelii
+macaca_mulatta
+mus_musculus
+sciurus_vulgaris
+felis_catus
+equus_caballus
+canis_lupus_familiaris

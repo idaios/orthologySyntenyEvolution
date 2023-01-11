@@ -1,0 +1,102 @@
+#!/usr/bin/python3
+import argparse
+import re
+import sys
+
+parser = argparse.ArgumentParser(description = 'Filters a fasta file removing sequences that do not fullfil a length criterion')
+
+parser.add_argument('-i','--input', help='The input file')
+parser.add_argument('-l', '--length', type=int, help='The minimum length')
+parser.add_argument('-m', '--methionine', help="The first aminoacid should be methionine", action="store_true")
+parser.add_argument('-U', '--unique_longer', help="Get only a single pep per gene, the longer one", action="store_true")
+parser.add_argument('-r', '--unique_random', help="Get onle a single pep per gene, a random one", action="store_true")
+
+args = parser.parse_args()
+
+if args.unique_longer and args.unique_random:
+    sys.exit("--unique_longer and --unique_random cannot be used simultaneously")
+
+seqre = re.compile(r'^>([^\[]+)')
+seqreGene = re.compile(r'^>.*(?:chromosome|primary_assembly|scaffold):[^:]+:([^:]+):([^:]+):([^:]+).*gene:([^ ]+)')
+
+name = ""
+seq = ""
+data = {}
+datalength = {}
+dataseqname = {}
+dataposition = {}
+
+with open(args.input, 'r') as f:
+    while True:
+        ln = f.readline() # why not using readlines?
+        ln = ln.strip()
+        m = False
+        g = False
+        m = seqre.search(ln)
+        
+        if m:
+            g = seqreGene.search(ln)
+            if len(seq) >= args.length  and ( (args.methionine and seq[0] == "M") or (args.methionine == False) ):
+                if args.unique_longer and g:
+                    if geneName not in data:
+                        data[geneName] = seq
+                        datalength[geneName] = len(seq)
+                        dataseqname[geneName] = name
+                        dataposition[geneName] = geneInfo
+                    elif datalength[geneName] < len(seq):
+                        data[geneName] = seq
+                        datalength[geneName] = len(seq)
+                        dataseqname[geneName] = name
+                        dataposition[geneName] = geneInfo
+                elif not g:
+                    sys.stderr.write("WARNING:\n"+ln+" NO CHROMOSOME INFO\n")
+                elif args.unique_longer == False and args.unique_random == False:
+                    print(">"+name+"\n"+seq+'\n', end='')
+                #    data[name] = seq
+            if (not g) and (not args.unique_longer):
+                name = m.group(1)
+            elif args.unique_longer and g:
+                geneName = g.group(4)
+                name = m.group(1)
+                geneInfo = (g.group(1), int(g.group(2)), int(g.group(3)))
+            else:
+                name = ""
+                
+            seq = ""
+            continue
+        
+        if (seq == "") and (name != ""):
+            seq = ln
+        elif(seq != "") and (name != ""):
+            seq += ln
+            
+        if not ln:
+            break
+
+# if seq != "":
+#     if len(seq) >= args.length  and ( (args.methionine and seq[0] == "M") or (args.methionine == False) ):
+#         if args.unique_longer:
+#             if geneName not in data:
+#                 data[geneName] = seq
+#                 datalength[geneName] = len(seq)
+#                 dataseqname[geneName] = name
+#                 dataposition[geneName] = (g.group(1), int(g.group(2)), int(g.group(3)))
+#             elif datalength[geneName] < len(seq):
+#                 data[geneName] = seq
+#                 datalength[geneName] = len(seq)
+#                 dataseqname[geneName] = name
+#                 dataposition[geneName] = (g.group(1), int(g.group(2)), int(g.group(3)))
+#         elif args.unique_longer == False and args.unique_random == False:
+#             print(">"+name+"\n"+seq+'\n', end='')
+
+
+sortedkeys = sorted(dataposition.keys(), key = lambda x: dataposition[x], reverse=False)
+#print(sortedkeys)
+
+if args.unique_longer:
+    #print("TRUE")
+    for k in sortedkeys:
+        #print(k)
+        #print(k+":"+str(dataposition[k])+str(dataseqname[k]))
+        print(">"+str(dataseqname[k]))
+        print(str(data[k]))
