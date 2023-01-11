@@ -52,6 +52,7 @@ with open(orthfile, 'r') as orth:
             genes = inSpeciesDelimiter.findall(t)
             tmpGenes[index-1] = genes
             for g in genes:
+                g = g.strip()
                 data[g] = orthogroupID
                 
             index+=1
@@ -98,7 +99,7 @@ with open(args.genome_list, 'r') as inplist:
         orgDictGenes.append(dictGenes)
         orgVGenes.append(vGenes)
 
-print(orgDictGenes[0]['ENSPTRP00000071475.1'])
+##print(orgDictGenes[0]['ENSPTRP00000071475.1'])
 
 ## Now, process the results 1-many initially since, I guess they are
 ## the most interesting
@@ -112,21 +113,73 @@ for i in range(len(oneToManyIndexes)):
             break
     ## at this point we know the reference gene
     refGene = orthoData[ind][oneIndex]
-    print(refGene)
+    #print(refGene)
     indexRefGene = orgDictGenes[oneIndex][refGene[0]]
     minIndexRefGene = max(0, indexRefGene - n)
     maxIndexRefGene = min(indexRefGene + n, len(orgVGenes[oneIndex])-1)
-    print(str(refGene) + " " + str(indexRefGene)+" "+str(minIndexRefGene)+" "+str(maxIndexRefGene))
+    #print(str(refGene) + " " + str(indexRefGene)+" "+str(minIndexRefGene)+" "+str(maxIndexRefGene))
 
     neighborOrthRefGene = []
     for j in range(minIndexRefGene, maxIndexRefGene+1, 1):
-        if j != indexRefGene:
-            key = orgVGenes[oneIndex][j]
-            if key in data:
-                orthogroup = data[ key ]
-                neighborOrthRefGene.append(orthogroup)
-    print(len(neighborOrthRefGene))
-    print(neighborOrthRefGene)
+        #if j != indexRefGene:
+        key = orgVGenes[oneIndex][j]
+        if key in data:
+            orthogroup = data[ key ]
+            if j == indexRefGene:
+                orthogroup = "*"+orthogroup+"*"
+            neighborOrthRefGene.append(orthogroup)
+
+    ## for all other organisms but the reference (the reference is the organism that has one copy)
+    for j in range(len(orthoCount[ind])):
+        ## skip the organism that is used as reference
+        if j == oneIndex:
+            continue
+        ## now, j is the index for another organism
+        ## This is the list of orthogroup partners of the reference gene for
+        ## the organism j
+        listOfOrtho = orthoData[ind][j]
+        
+        #print("The list of orthologues for the "+refGene[0]+"("+data[refGene[0]]+") is: ", end=" ")
+        #print(listOfOrtho)
+        for orthogene in listOfOrtho:
+            ## HERE
+            orthogene = orthogene.strip()
+            indexOrthGene = orgDictGenes[j][orthogene]
+            minIndexOrthGene = max(0, indexOrthGene - n)
+            maxIndexOrthGene = min(indexOrthGene + n, len(orgVGenes[j])-1)
+            #print(str(orthogene) + " " + str(indexOrthGene)+" "+str(minIndexOrthGene)+" "+str(maxIndexOrthGene))
+
+            neighborOrthOrthGene = []
+            for jj in range(minIndexOrthGene, maxIndexOrthGene+1, 1):
+                #if jj != indexOrthGene:
+                key = orgVGenes[j][jj]
+                if jj == indexOrthGene and key not in data:
+                    sys.stderr.write("Cannot be that the gene --"+key+"-- is not in the data\n")
+                    print(data[key])
+                    sys.exit()
+                                     
+                if key in data:
+                    orthogroup = data[ key ]
+                    if jj == indexOrthGene:
+                        orthogroup = "**"+orthogroup+"**"
+                    neighborOrthOrthGene.append(orthogroup)
+            #print ("indexOrth:"+str(indexOrthGene)+" min:"+str(minIndexOrthGene)+" max:"+str(maxIndexOrthGene))
+            common = list(set(neighborOrthRefGene).intersection(neighborOrthOrthGene))
+            percentageCommon = len(common)
+            print(neighborOrthOrthGene)
+            print(neighborOrthRefGene)
+            print()
+
+
+
+
+
+            
+
+            
+            
+    #print(len(neighborOrthRefGene))
+    #print(neighborOrthRefGene)
 
 # for i in oneToManyIndexes:
 #     print(orthoData[i])
