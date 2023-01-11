@@ -3,6 +3,7 @@ import argparse
 import re
 import sys
 import glob
+import numpy as np
 
 # change this if needed
 fadir="fa_files" 
@@ -12,6 +13,68 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-gl', '--genome_list', help="Provide a list of genomes that you want to analyze. This should be a file with a single filename in each line that represents a single proteome (or genome). A PAIR of proteomes should be provided here", required=True)
 parser.add_argument('-og', '--orthology_results', help="Provide the results of Orthofinder which refer to the orthogroups", required=True)
 parser.add_argument('-n', '--neighbors', help="The number of neighboring genes to assess the synteny proportion")
+
+
+### nw function #################################
+def nw(x, y, match = 1, mismatch = 1, gap = 2):
+    score = 0
+    nx = len(x)
+    ny = len(y)
+    # Optimal score at each possible pair of characters.
+    F = np.zeros((nx + 1, ny + 1))
+    F[:,0] = np.linspace(0, -nx * gap, nx + 1)
+    F[0,:] = np.linspace(0, -ny * gap, ny + 1)
+    # Pointers to trace through an optimal aligment.
+    P = np.zeros((nx + 1, ny + 1))
+    P[:,0] = 3
+    P[0,:] = 4
+    # Temporary scores.
+    t = np.zeros(3)
+    for i in range(nx):
+        for j in range(ny):
+            if x[i] == y[j]:
+                t[0] = F[i,j] + match
+            else:
+                t[0] = F[i,j] - mismatch
+            t[1] = F[i,j+1] - gap
+            t[2] = F[i+1,j] - gap
+            tmax = np.max(t)
+            F[i+1,j+1] = tmax
+            if t[0] == tmax:
+                P[i+1,j+1] += 2
+            if t[1] == tmax:
+                P[i+1,j+1] += 3
+            if t[2] == tmax:
+                P[i+1,j+1] += 4
+    score = tmax
+    # Trace through an optimal alignment.
+    i = nx
+    j = ny
+    rx = []
+    ry = []
+    while i > 0 or j > 0:
+        if P[i,j] in [2, 5, 6, 9]:
+            rx.append(x[i-1])
+            ry.append(y[j-1])
+            i -= 1
+            j -= 1
+        elif P[i,j] in [3, 5, 7, 9]:
+            rx.append(x[i-1])
+            ry.append('-')
+            i -= 1
+        elif P[i,j] in [4, 6, 7, 9]:
+            rx.append('-')
+            ry.append(y[j-1])
+            j -= 1
+    # Reverse the strings.
+    rx = ''.join(rx)[::-1]
+    ry = ''.join(ry)[::-1]
+    return score #'\n'.join([rx, ry])
+
+
+#################################################
+
+
 
 # Parse and print the results
 args = parser.parse_args()
@@ -73,6 +136,7 @@ dictGenes = {}
 vGenes = []
 orgDictGenes = []
 orgVGenes = []
+seq={}
 ## read the genomes
 
 with open(args.genome_list, 'r') as inplist:
@@ -86,16 +150,26 @@ with open(args.genome_list, 'r') as inplist:
         fastaFile = glob.glob(path)[0]
         curIndex = 0
         vGenes = []
+        aGene = ""
         with open(fastaFile, 'r') as fa:
             for ln in fa:
-                ln.strip()
+                ln = ln.strip()
                 m = fastaSpec.match(ln)
                 if m:
+                    if aGene != "":
+                        sys.stderr.write("Error parsing sequences\n")
+                        sys.exit()
                     aGene = m.group(1)
                     dictGenes[aGene] = curIndex
                     vGenes.append(aGene)
                     curIndex+=1
-
+                else:
+                    if aGene == "":
+                        sys.stderr.write("Error 2 parsing sequences\n")
+                        sys.exit()
+                    seq[aGene] = ln
+                    aGene = ""
+                        
         orgDictGenes.append(dictGenes)
         orgVGenes.append(vGenes)
 
@@ -165,10 +239,10 @@ for i in range(len(oneToManyIndexes)):
                     neighborOrthOrthGene.append(orthogroup)
             #print ("indexOrth:"+str(indexOrthGene)+" min:"+str(minIndexOrthGene)+" max:"+str(maxIndexOrthGene))
             common = list(set(neighborOrthRefGene).intersection(neighborOrthOrthGene))
-            percentageCommon = len(common)
-            print(neighborOrthOrthGene)
-            print(neighborOrthRefGene)
-            print()
+            percentageCommon = len(common)/len(set(neighborOrthOrthGene+neighborOrthRefGene))
+            alScore = nw(seq[refGene[0]], seq[orthogene])/(len(seq[refGene[0]])+len(seq[orthogene]))
+            print(refGene[0]+" "+orthogene+" "+str(percentageCommon)+" "+str(alScore)+" "+str(len(seq[refGene[0]]))+" "+str(len(seq[orthogene])))
+
 
 
 
