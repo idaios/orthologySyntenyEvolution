@@ -7,6 +7,7 @@ import glob
 # change this if needed
 fadir="fa_files" 
 
+n = 10
 parser = argparse.ArgumentParser()
 parser.add_argument('-gl', '--genome_list', help="Provide a list of genomes that you want to analyze. This should be a file with a single filename in each line that represents a single proteome (or genome). A PAIR of proteomes should be provided here", required=True)
 parser.add_argument('-og', '--orthology_results', help="Provide the results of Orthofinder which refer to the orthogroups", required=True)
@@ -22,6 +23,8 @@ orthfile = args.orthology_results
 # will just keep a track of all genes that belong to an orthogroup
 betweenSpeciesDelimiter = re.compile("[^\t]+")
 inSpeciesDelimiter = re.compile("[^,]+")
+## the specification of a fasta name in order to parse the names of sequences
+fastaSpec = re.compile(r"^>([^ ]+)")
 
 data = {}
 orthogroupID = ""
@@ -30,6 +33,7 @@ orthoData=[]
 orthoCount=[]
 oneToManyIndexes=[]
 tmpGenes=[None]*2
+geneOrder=[]
 with open(orthfile, 'r') as orth:
     while True:
         ln = orth.readline()
@@ -63,7 +67,13 @@ with open(orthfile, 'r') as orth:
             oneToManyIndexes.append(len(orthoCount)-1)
 
 
+
+dictGenes = {}
+vGenes = []
+orgDictGenes = []
+orgVGenes = []
 ## read the genomes
+
 with open(args.genome_list, 'r') as inplist:
     while True:
         f = inplist.readline()
@@ -73,11 +83,50 @@ with open(args.genome_list, 'r') as inplist:
         
         path=fadir+"/"+f+"*"
         fastaFile = glob.glob(path)[0]
-
+        curIndex = 0
+        vGenes = []
         with open(fastaFile, 'r') as fa:
             for ln in fa:
                 ln.strip()
-                
+                m = fastaSpec.match(ln)
+                if m:
+                    aGene = m.group(1)
+                    dictGenes[aGene] = curIndex
+                    vGenes.append(aGene)
+                    curIndex+=1
+
+        orgDictGenes.append(dictGenes)
+        orgVGenes.append(vGenes)
+
+print(orgDictGenes[0]['ENSPTRP00000071475.1'])
+
+## Now, process the results 1-many initially since, I guess they are
+## the most interesting
+for i in range(len(oneToManyIndexes)):
+    ind = oneToManyIndexes[i]
+    oneIndex = 0
+    
+    for j in range(len(orthoCount[ind])):
+        if orthoCount[ind][j] == 1:
+            oneIndex = j
+            break
+    ## at this point we know the reference gene
+    refGene = orthoData[ind][oneIndex]
+    print(refGene)
+    indexRefGene = orgDictGenes[oneIndex][refGene[0]]
+    minIndexRefGene = max(0, indexRefGene - n)
+    maxIndexRefGene = min(indexRefGene + n, len(orgVGenes[oneIndex])-1)
+    print(str(refGene) + " " + str(indexRefGene)+" "+str(minIndexRefGene)+" "+str(maxIndexRefGene))
+
+    neighborOrthRefGene = []
+    for j in range(minIndexRefGene, maxIndexRefGene+1, 1):
+        if j != indexRefGene:
+            key = orgVGenes[oneIndex][j]
+            if key in data:
+                orthogroup = data[ key ]
+                neighborOrthRefGene.append(orthogroup)
+    print(len(neighborOrthRefGene))
+    print(neighborOrthRefGene)
 
 # for i in oneToManyIndexes:
 #     print(orthoData[i])
