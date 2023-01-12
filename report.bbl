@@ -1,9 +1,14 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{3}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \providecommand{\doi}[1]{doi: #1}\else
   \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Buchfink et~al.(2015)Buchfink, Xie, and Huson]{buchfink2015fast}
+Benjamin Buchfink, Chao Xie, and Daniel~H Huson.
+\newblock Fast and sensitive protein alignment using diamond.
+\newblock \emph{Nature methods}, 12\penalty0 (1):\penalty0 59--60, 2015.
 
 \bibitem[Cunningham et~al.(2022)Cunningham, Allen, Allen, Alvarez-Jarreta,
   Amode, Armean, Austine-Orimoloye, Azov, Barnes, Bennett,
@@ -14,5 +19,11 @@ Fiona Cunningham, James~E Allen, Jamie Allen, Jorge Alvarez-Jarreta, M~Ridwan
 \newblock Ensembl 2022.
 \newblock \emph{Nucleic acids research}, 50\penalty0 (D1):\penalty0 D988--D995,
   2022.
+
+\bibitem[Emms and Kelly(2019)]{emms2019orthofinder}
+David~M Emms and Steven Kelly.
+\newblock Orthofinder: phylogenetic orthology inference for comparative
+  genomics.
+\newblock \emph{Genome biology}, 20\penalty0 (1):\penalty0 1--14, 2019.
 
 \end{thebibliography}
