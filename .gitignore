@@ -1,4 +1,6 @@
+all_ensembl_proteomes
 original
 orthofinder_data
 orthofinder_data.tar.gz
 *.fa
+*.fa.gz
