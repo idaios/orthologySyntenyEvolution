@@ -4,6 +4,10 @@ import re
 import sys
 import glob
 import numpy as np
+sys.path.append('./pairwise-alignment-in-python')
+import alignment
+import time
+
 
 # change this if needed
 fadir="fa_files" 
@@ -14,6 +18,13 @@ parser.add_argument('-gl', '--genome_list', help="Provide a list of genomes that
 parser.add_argument('-og', '--orthology_results', help="Provide the results of Orthofinder which refer to the orthogroups", required=True)
 parser.add_argument('-n', '--neighbors', help="The number of neighboring genes to assess the synteny proportion")
 
+### progress bar function #######################
+def print_progress_bar(index, total, label):
+    n_bar = 50  # Progress bar width
+    progress = index / total
+    sys.stderr.write('\r')
+    sys.stderr.write(f"[{'=' * int(n_bar * progress):{n_bar}s}] {int(100 * progress)}%  {label}")
+    sys.stderr.flush()
 
 ### nw function #################################
 def nw(x, y, match = 1, mismatch = 1, gap = 2):
@@ -177,6 +188,7 @@ with open(args.genome_list, 'r') as inplist:
 
 ## Now, process the results 1-many initially since, I guess they are
 ## the most interesting
+startTime = time.time()
 for i in range(len(oneToManyIndexes)):
     ind = oneToManyIndexes[i]
     oneIndex = 0
@@ -240,10 +252,16 @@ for i in range(len(oneToManyIndexes)):
             #print ("indexOrth:"+str(indexOrthGene)+" min:"+str(minIndexOrthGene)+" max:"+str(maxIndexOrthGene))
             common = list(set(neighborOrthRefGene).intersection(neighborOrthOrthGene))
             percentageCommon = len(common)/len(set(neighborOrthOrthGene+neighborOrthRefGene))
-            alScore = nw(seq[refGene[0]], seq[orthogene])/(len(seq[refGene[0]])+len(seq[orthogene]))
-            print(refGene[0]+" "+orthogene+" "+str(percentageCommon)+" "+str(alScore)+" "+str(len(seq[refGene[0]]))+" "+str(len(seq[orthogene])))
-
-
+            #alScore = nw(seq[refGene[0]], seq[orthogene])/(len(seq[refGene[0]])+len(seq[orthogene]))
+            
+            #print(refGene[0]+" "+orthogene+" "+str(percentageCommon)+" "+str(alScore)+" "+str(len(seq[refGene[0]]))+" "+str(len(seq[orthogene])))
+            print(refGene[0]+"\t"+orthogene+"\t"+str(percentageCommon)+"\t", end="")
+            needleAl = alignment.needle(seq[refGene[0]], seq[orthogene])
+            currentTime = time.time()
+            timeElapsed = round(currentTime - startTime, 1)
+            estimatedTime = round(len(oneToManyIndexes)*timeElapsed/(i+1), 1)
+            print_progress_bar(i, len(oneToManyIndexes), "elapsed:"+str(timeElapsed)+" rem:"+str(estimatedTime)+" -- orthologs")
+            
 
 
 
