@@ -1,0 +1,18 @@
+\begin{thebibliography}{1}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Cunningham et~al.(2022)Cunningham, Allen, Allen, Alvarez-Jarreta,
+  Amode, Armean, Austine-Orimoloye, Azov, Barnes, Bennett,
+  et~al.]{cunningham2022ensembl}
+Fiona Cunningham, James~E Allen, Jamie Allen, Jorge Alvarez-Jarreta, M~Ridwan
+  Amode, Irina~M Armean, Olanrewaju Austine-Orimoloye, Andrey~G Azov,
+  If~Barnes, Ruth Bennett, et~al.
+\newblock Ensembl 2022.
+\newblock \emph{Nucleic acids research}, 50\penalty0 (D1):\penalty0 D988--D995,
+  2022.
+
+\end{thebibliography}

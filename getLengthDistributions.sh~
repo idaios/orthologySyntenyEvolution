@@ -1,0 +1,3 @@
+for f in `ls original/*.fa`; do
+    ./distrLengths.py -i $f;
+done | sed 's/original\///g'| sed 's/\.[^\t]*//g'

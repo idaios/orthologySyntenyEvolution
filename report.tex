@@ -1,0 +1,76 @@
+\documentclass[12pt]{article}
+
+\usepackage{natbib}
+\usepackage{xurl}
+\usepackage{graphicx}
+
+\title{Evolutionary rate of orthologs and paralogs}
+\date{\today}
+\author{Pavlos Pavlidis}
+
+\begin{document}
+\maketitle
+
+\section*{Abstract}
+abstract
+
+\section*{Introduction}
+Intro
+
+\section*{Materials and Methods}
+\subsection*{Data and filtering}
+\paragraph{Data:} We downloaded the whole proteome of a set of organisms $S$ from the
+Ensembl database~\citep{cunningham2022ensembl}, using custom scripts (Supplementary File XXXX). The
+list of organisms is shown in Table~\ref{tab:listorgs}. Ensembl
+proteomes are stored in the
+\url{https://ftp.ensembl.org/pub/current_fasta/} directory of the
+Ensembl ftp server and they are organized in separate folders based on
+the scientific name of the organism (in a folder called `pep'). They
+are represented in FASTA format with information-rich 
+headers (i.e., the protein ID, gene ID, transcript ID as well as the
+location of the protein in the genome is provided). This information
+allowed us to filter sequences according to some predefined
+criteria.
+
+\paragraph{Filtering:} Prior to the analysis, we applied to filtering
+procedures on the protein datasets. The first filter refers to
+\emph{(i) Keep longer protein isoforms}. For 
+each distinct Ensembl gene ID, we kept only the Protein ID that
+corresponds to the longest polypeptide sequence. The second filtering
+procedure refers to
+\emph{(ii) keep proteins with a minimum length}. As shown in
+Table~\ref{tab:lengthdist}, a protein length (after applying filter
+(i)), ranges between less than ten and several thousands of amino acids. We
+kept only proteins comprise a minimum length of 100 amino acids
+since this value corresponds to approximate the 5\% of protein
+lengths (Table~\ref{tab:lengthdist}).
+
+\begin{table}[htbp!]
+  \caption{The percentiles of protein lengths for the organisms used
+    in the study}
+  \label{tab:lengthdist}
+  \begin{tabular}{|l|lllllll|}
+    
+    & 0                        & 5  & 10  & 50  & 90   & 95   & 100
+    \\
+    \hline
+    {\it Canis lupus familiaris} & 15 & 100 & 134 & 410  & 1077 & 1440  & 27097 \\
+    {\it Equus caballus}          & 13 & 110 & 154 & 425  & 1105 & 1452  & 34311 \\
+    {\it Felis catus}             & 13 & 105 & 147 & 425  & 1096 & 1461  & 27108 \\
+    {\it Homo sapiens}            & 2  & 107 & 137 & 410  & 1066 & 1455  & 35991 \\
+    {\it Macaca mulatta}          & 17 & 106 & 126 & 409  & 1084 & 1419  & 35478 \\
+    {\it Mus musculus}            & 3  & 112 & 143 & 384  & 1033 & 1401  & 35390 \\
+    {\it Pan troglodytes} & 18      & 90 & 120 & 384 & 1035 & 1399 & 34270\\
+    {\it Pongo abelii}            & 4  & 102 & 136 & 411  & 1068 & 1430  & 34347 \\
+    {\it Sciurus vulgaris}        & 18 & 89  & 119 & 359  & 983  & 1315  &
+    34292\\
+    
+  \end{tabular}
+\end{table}
+
+\section*{Results}
+
+\bibliographystyle{plainnat}
+\bibliography{biblio}
+
+\end{document}

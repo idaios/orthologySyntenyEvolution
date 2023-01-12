@@ -1,0 +1,26 @@
+\documentclass[12pt]{article}
+
+\usepackage{natbib}
+\usepackage{graphicx}
+
+\title{A title}
+\date{}
+\author{}
+
+\begin{document}
+\maketitle
+
+\section*{Abstract}
+abstract
+
+\section*{Introduction}
+Intro
+
+\section*{Materials and Methods}
+MM
+
+\section*{Results}
+
+\bibliography{biblio}
+
+\end{document}
